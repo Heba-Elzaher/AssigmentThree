@@ -1,15 +1,15 @@
 package com.example.assigmentthree.service.impl;
 
+import com.example.assigmentthree.twoFA.EmailTemplate;
+import com.example.assigmentthree.twoFA.OtpGenerator;
 import jakarta.mail.MessagingException;
 
 import com.example.assigmentthree.exception.ResourceNotFoundException;
 import com.example.assigmentthree.model.AuthResponse;
 import com.example.assigmentthree.model.UserData;
 import com.example.assigmentthree.repository.UserRepository;
-import com.example.assigmentthree.security.JwtGenerator;
+import com.example.assigmentthree.jwt.GenerateJWT;
 import com.example.assigmentthree.service.LoginService;
-import com.example.assigmentthree.util.EmailUtil;
-import com.example.assigmentthree.util.OtpUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -23,65 +23,64 @@ import java.time.LocalDateTime;
 @Service
 public class LoginServiceImpl implements LoginService {
     private AuthenticationManager authenticationManager;
-    private JwtGenerator jwtGenerator;
-    private OtpUtil otpUtil;
-    private EmailUtil emailUtil;
+    private GenerateJWT generateJWT;
+    private OtpGenerator otpGenerator;
+    private EmailTemplate emailTemplate;
     private UserRepository userRepository;
 
     @Autowired
-    public LoginServiceImpl(AuthenticationManager authenticationManager, UserRepository userRepository) {
+    public LoginServiceImpl(AuthenticationManager authenticationManager, GenerateJWT generateJWT, OtpGenerator otpGenerator, EmailTemplate emailTemplate, UserRepository userRepository) {
         this.authenticationManager = authenticationManager;
-
+        this.generateJWT = generateJWT;
+        this.otpGenerator = otpGenerator;
+        this.emailTemplate = emailTemplate;
         this.userRepository = userRepository;
     }
 
     @Override
     public String authentication(UserData userData) {
         Authentication authentication = authenticationManager.
-                authenticate(new UsernamePasswordAuthenticationToken(userData.getEmail()
-                        , userData.getPassword()));
+                authenticate(new UsernamePasswordAuthenticationToken(userData.getEmail(), userData.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         return "This user already exists.";
     }
 
     @Override
-    public String verifyTwoFactor(UserData user) {
-        String otp = otpUtil.generateOtp();
+    public String generateTwoFactor(UserData user) {
         try {
-            emailUtil.sendOtpEmail(user.getEmail(), otp);
+            String otp = otpGenerator.generateOTP(6);
+            emailTemplate.sendOtpEmail(user.getEmail(), otp);
+            UserData userData = userRepository.findByEmail(user.getEmail()).orElseThrow(
+                    () -> new ResourceNotFoundException("User", "Email", user.getEmail()));
+            userData.setOtp(otp);
+            userData.setOtpTime(LocalDateTime.now());
+            userRepository.save(userData);
         } catch (MessagingException e) {
             throw new RuntimeException("Failed to send the OTP. Please try again.");
         }
-        UserData userData = userRepository.findByEmail(user.getEmail()).orElseThrow(
-                () -> new ResourceNotFoundException("User", "Email", user.getEmail()));
-        userData.setOtp(otp);
-        userData.setOtpGeneratedTime(LocalDateTime.now());
-        userRepository.save(userData);
-
-        return "OTP has been generated and sent to " + user.getEmail();
+        return "OTP has been generated ";
     }
 
     @Override
     public String verifyUser(String email, String otp) {
         UserData user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("No user found with this email: " + email));
-        if (user.getOtp().equals(otp) && Duration.between(user.getOtpGeneratedTime(),
+        if (user.getOtp().equals(otp) && Duration.between(user.getOtpTime(),
                 LocalDateTime.now()).getSeconds() < (60)) {
-            user.setActive(true);
+            user.setVerified(true);
             userRepository.save(user);
-            return "You have been successfully authenticated. Please return to the website and click \"CONTINUE\".";
+            return "Successfully authenticated!";
         }
-        return "The OTP has expired. Please try again.  ";
+        return "The OTP has expired or incorrect. ";
     }
 
     @Override
-    public AuthResponse verifyOtp(String email) {
+    public AuthResponse isVerified(String email) {
         UserData user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("No user found with this email: " + email));
-        boolean isActive = user.isActive();
-        if (isActive) {
-            String token = jwtGenerator.generateToken(email);
+        if (user.isVerified()) {
+            String token = generateJWT.tokenGenerator(email); // generating the token and passing the email
             return new AuthResponse(token);
         }
         return null;

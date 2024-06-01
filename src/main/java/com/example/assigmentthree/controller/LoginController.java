@@ -26,7 +26,7 @@ public class LoginController {
 
     @PostMapping(value = "/mfa")
     public ResponseEntity<String> twoFactorAuth(@RequestBody UserData userData) {
-        return new ResponseEntity<String>(loginService.toString(userData), HttpStatus.OK);
+        return new ResponseEntity<String>(loginService.generateTwoFactor(userData), HttpStatus.OK);
     }
 
     @GetMapping(value = "/verify-account")
@@ -36,6 +36,6 @@ public class LoginController {
 
     @GetMapping(value = "/verify")
     public ResponseEntity<AuthResponse> verify(@RequestParam String email) {
-        return new ResponseEntity<AuthResponse>(loginService.verifyOtp(email), HttpStatus.OK);
+        return new ResponseEntity<AuthResponse>(loginService.isVerified(email), HttpStatus.OK);
     }
 }
