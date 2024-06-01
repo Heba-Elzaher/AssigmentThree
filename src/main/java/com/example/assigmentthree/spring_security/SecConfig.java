@@ -1,4 +1,4 @@
-package spring_security;
+package com.example.assigmentthree.spring_security;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -21,14 +21,15 @@ import static org.springframework.security.config.Customizer.withDefaults;
 public class SecConfig {
     private final UnAuthEntryPoint unAuthEntryPoint;
     private final UserManagerService userManagerService;
-   // private final JwtAuthFilter jwtAuthFilter;
+    private final CookieFilter cookieFilter;
 
     @Autowired
-    public SecConfig(UnAuthEntryPoint unAuthEntryPoint, UserManagerService userManagerService) {
+    public SecConfig(UnAuthEntryPoint unAuthEntryPoint, UserManagerService userManagerService, CookieFilter cookieFilter) {
         this.unAuthEntryPoint = unAuthEntryPoint;
         this.userManagerService = userManagerService;
-
+        this.cookieFilter = cookieFilter;
     }
+
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -44,7 +45,7 @@ public class SecConfig {
                 .httpBasic(withDefaults()); // checks if the user is authenticated
 
         // checks the username and password
-        http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(cookieFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

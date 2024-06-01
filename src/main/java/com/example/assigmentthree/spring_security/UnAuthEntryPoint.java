@@ -1,4 +1,4 @@
-package spring_security;
+package com.example.assigmentthree.spring_security;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
