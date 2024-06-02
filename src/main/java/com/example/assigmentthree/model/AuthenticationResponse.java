@@ -3,11 +3,11 @@ package com.example.assigmentthree.model;
 import lombok.Data;
 
 @Data
-public class AuthResponse {
+public class AuthenticationResponse {
     private  String accessToken;
     private  String tokenType = "Bearer ";
 
-    public AuthResponse(String accessToken) {
+    public AuthenticationResponse(String accessToken) {
         this.accessToken = accessToken;
     }
 }

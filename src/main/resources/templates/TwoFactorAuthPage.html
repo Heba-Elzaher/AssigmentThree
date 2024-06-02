@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GreenRewards - Two Factor Authentication</title>
+    <link rel="stylesheet" href="/css/TwoFactorAuthPage.css">
+</head>
+<body>
+<header>
+    <div class="header-container">
+        <div class="logo">
+            <img src="/Images/image.png" alt="GreenRewards Logo">
+            <h1>GreenRewards</h1>
+        </div>
+    </div>
+</header>
+<div class="container">
+    <h2>Two Factor Authentication</h2>
+    <div class="content">
+        <div class="form-container">
+            <p><strong>A verification link has been sent to your email.
+                Press the button below to access your email and click the link in your email to verify your account</strong>.</p>
+            <button class="btn" id="check-email-btn" onclick="submitForm()">Check Email</button>
+            <div id="errorMessage" class="error-message"></div> <!-- Error message container -->
+        </div>
+        <div class="image-container">
+            <img src="/Images/image%20(10).png" alt="Email Verification" class="small-image">
+        </div>
+    </div>
+</div>
+<footer>
+    <div class="footer-container">
+        <p>&copy; 2024 GreenRewards. All rights reserved.</p>
+    </div>
+</footer>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        submitForm();
+    });
+
+    function getQueryParam(name) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(name);
+    }
+
+    function submitForm() {
+        const email = getQueryParam('email'); // Retrieve email from query parameters
+        if (!email) {
+            console.log("Email is missing. Please try again.");
+            return;
+        }
+
+        fetch(`/verifyUser?email=${encodeURIComponent(email)}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Request failed');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.accessToken) {
+                    // Set token and email as cookies
+                    setCookie('token', data.accessToken);
+                    setCookie('email', email);
+
+                    // After successful login, fetch the dashboard with authorization token
+                    window.location.replace("/dashboard");
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+            });
+    }
+
+    function setCookie(name, value, minutes = 5) {
+        let expires = "";
+        if (minutes) {
+            const date = new Date();
+            date.setTime(date.getTime() + (minutes * 60 * 1000));
+            expires = "; expires=" + date.toUTCString();
+        }
+        document.cookie = `${name}=${value || ""}${expires}; path=/`;
+    }
+</script>
+</body>
+</html>

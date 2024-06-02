@@ -5,7 +5,7 @@ import com.example.assigmentthree.twoFA.OtpGenerator;
 import jakarta.mail.MessagingException;
 
 import com.example.assigmentthree.exception.ResourceNotFoundException;
-import com.example.assigmentthree.model.AuthResponse;
+import com.example.assigmentthree.model.AuthenticationResponse;
 import com.example.assigmentthree.model.UserData;
 import com.example.assigmentthree.repository.UserRepository;
 import com.example.assigmentthree.jwt.GenerateJWT;
@@ -43,7 +43,7 @@ public class LoginServiceImpl implements LoginService {
                 authenticate(new UsernamePasswordAuthenticationToken(userData.getEmail(), userData.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        return "This user already exists.";
+        return "Authenticated";
     }
 
     @Override
@@ -76,13 +76,27 @@ public class LoginServiceImpl implements LoginService {
     }
 
     @Override
-    public AuthResponse isVerified(String email) {
+    public AuthenticationResponse isVerified(String email) {
         UserData user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("No user found with this email: " + email));
         if (user.isVerified()) {
             String token = generateJWT.tokenGenerator(email); // generating the token and passing the email
-            return new AuthResponse(token);
+            return new AuthenticationResponse(token);
         }
         return null;
     }
+
+    @Override
+    public String signOut(String email) {
+        System.out.println(email);
+        UserData user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found with this email: " + email));
+        user.setVerified(false);
+        System.out.println("TEST");
+        user.setOtp(null);
+        user.setOtpTime(null);
+        userRepository.save(user);
+        return "log out";
+    }
+
 }

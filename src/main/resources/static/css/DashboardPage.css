@@ -1,0 +1,193 @@
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f5f5f5;
+}
+
+header {
+    width: 100%;
+    background-color: #ffffff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    padding: 20px 0;
+    display: flex;
+    justify-content: center;
+    position: relative;
+}
+
+.header-container {
+    width: 100%;
+    max-width: 1200px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+}
+
+.logo img {
+    width: 40px;
+    margin-right: 10px;
+}
+
+h1 {
+    margin: 0;
+    font-size: 24px;
+    color: #4CAF50;
+}
+
+.navbar {
+    display: flex;
+}
+
+.nav-list {
+    list-style: none;
+    display: flex;
+    margin: 0;
+    padding: 0;
+}
+
+.nav-item {
+    margin-left: 20px;
+}
+
+.nav-link {
+    text-decoration: none;
+    color: #333333;
+    font-size: 16px;
+    transition: color 0.3s;
+}
+
+.nav-link:hover {
+    color: #4CAF50;
+}
+
+.container {
+    width: 100%;
+    max-width: 1200px;
+    padding: 40px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.rewards-section {
+    width: 100%;
+    margin-bottom: 40px; /* Increased margin-bottom for more space */
+}
+
+.rewards-section h2 {
+    text-align: left;
+    font-family: 'Georgia', serif; /* Different font for h2 */
+    font-size: 24px;
+    color: #333333;
+}
+
+.rewards-card {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    color: #333333; /* Font color for the rewards card */
+}
+
+.rewards-details {
+    text-align: left;
+}
+
+.rewards-details p {
+    margin: 10px 0; /* Increased margin for larger spacing */
+    font-size: 18px; /* Larger font size */
+}
+
+.icon {
+    width: 20px;
+    vertical-align: middle;
+}
+
+.trophy-icon {
+    width: 60px;
+    height: auto;
+}
+
+main {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    width: 100%;
+    margin-top: 20px; /* Added margin-top for more space */
+}
+
+.card {
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    padding: 20px;
+    transition: transform 0.3s, box-shadow 0.3s;
+    color: white;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+}
+
+.card img {
+    width: 50px;
+    height: 50px;
+    margin-bottom: 10px;
+}
+
+.card h3 {
+    margin: 0;
+    font-size: 18px;
+    color: white;
+}
+
+#plant-trees {
+    background-color: #41B56B;
+}
+
+#rewards {
+    background-color: #4F8462;
+}
+
+#history {
+    background-color: rgba(65, 181, 107, 0.72);
+}
+
+#ai {
+    background-color: #2fcf6d;
+    color: black;
+}
+
+footer {
+    width: 100%;
+    background-color: #ffffff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    padding: 20px 0;
+    text-align: center;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+}
+
+.footer-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+footer p {
+    margin: 0;
+    font-size: 14px;
+    color: #666666;
+}

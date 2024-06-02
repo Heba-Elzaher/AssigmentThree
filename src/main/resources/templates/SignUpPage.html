@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GreenRewards - Register</title>
+    <link rel="stylesheet" href="/css/SignUpPage.css"> <!-- Adjusted path based on common structure -->
+</head>
+<body>
+<header>
+    <div class="header-container">
+        <div class="logo">
+            <img src="/Images/image.png" alt="GreenRewards Logo"> <!-- Adjusted path based on common structure -->
+            <h1>GreenRewards</h1>
+        </div>
+        <nav>
+            <a href="/login" class="nav-link">Log In</a>
+            <a href="/" class="nav-link">Home</a>
+        </nav>
+    </div>
+</header>
+<div class="container">
+    <main>
+        <h2>Hello, Please Register!</h2>
+        <div class="content">
+            <div class="form-container">
+                <form id="registration-form">
+                    <div class="form-group">
+                        <label for="first-name">First Name</label>
+                        <input type="text" id="first-name" name="first-name" required>
+                        <div class="error-message" id="first-name-error"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="last-name">Last Name</label>
+                        <input type="text" id="last-name" name="last-name" required>
+                        <div class="error-message" id="last-name-error"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="dob">Date of Birth</label>
+                        <input type="date" id="dob" name="dob" required>
+                        <div class="error-message" id="dob-error"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" required>
+                        <div class="error-message" id="email-error"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" required>
+                        <small>Password must be at least 8 characters long, contain an uppercase letter, a number, and a
+                            special character.</small>
+                        <div class="error-message" id="password-error"></div>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn">Register</button>
+                    </div>
+                    <div class="error-message" id="form-error"></div> <!-- Error message container -->
+                </form>
+            </div>
+            <div class="image-container">
+                <img src="/Images/world.png" alt="Earth in Hand" class="small-image">
+            </div>
+        </div>
+    </main>
+</div>
+<footer>
+    <div class="footer-container">
+        <p>&copy; 2024 GreenRewards. All rights reserved.</p>
+    </div>
+</footer>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const form = document.getElementById('registration-form');
+        const firstName = document.getElementById('first-name');
+        const lastName = document.getElementById('last-name');
+        const dob = document.getElementById('dob');
+        const email = document.getElementById('email');
+        const password = document.getElementById('password');
+        const errorMessages = {
+            firstName: document.getElementById('first-name-error'),
+            lastName: document.getElementById('last-name-error'),
+            dob: document.getElementById('dob-error'),
+            email: document.getElementById('email-error'),
+            password: document.getElementById('password-error'),
+            form: document.getElementById('form-error') // Form error message container
+        };
+
+        form.addEventListener('submit', function (event) {
+            event.preventDefault();
+            let isValid = true;
+
+            // Reset error messages
+            Object.values(errorMessages).forEach(errorDiv => {
+                errorDiv.textContent = '';
+                errorDiv.style.display = 'none';
+            });
+
+            // Check if first name is provided
+            if (firstName.value.trim() === '') {
+                errorMessages.firstName.textContent = 'First name is required.';
+                errorMessages.firstName.style.display = 'block';
+                isValid = false;
+            }
+
+            // Check if last name is provided
+            if (lastName.value.trim() === '') {
+                errorMessages.lastName.textContent = 'Last name is required.';
+                errorMessages.lastName.style.display = 'block';
+                isValid = false;
+            }
+
+            // Check if date of birth is provided
+            if (dob.value.trim() === '') {
+                errorMessages.dob.textContent = 'Date of birth is required.';
+                errorMessages.dob.style.display = 'block';
+                isValid = false;
+            }
+
+            // Check if email is valid
+            if (!email.validity.valid) {
+                errorMessages.email.textContent = 'Please enter a valid email address.';
+                errorMessages.email.style.display = 'block';
+                isValid = false;
+            }
+
+            // Check if password meets criteria
+            const passwordValue = password.value;
+            const passwordCriteria = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
+            if (!passwordCriteria.test(passwordValue)) {
+                errorMessages.password.textContent = 'Password must be at least 8 characters long, contain an uppercase letter, a number, and a special character.';
+                errorMessages.password.style.display = 'block';
+                isValid = false;
+            }
+
+            if (!isValid) {
+                return;
+            }
+
+            // Call the register function
+            register();
+        });
+    });
+
+    function register() {
+        var form = document.getElementById("registration-form");
+        var formData = {
+            first_name: form['first-name'].value,
+            last_name: form['last-name'].value,
+            email: form.email.value,
+            password: form.password.value,
+            date_of_birth: form.dob.value
+        };
+
+        fetch("/newUser", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(formData)
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Request failed");
+                }
+                return response.json();
+            })
+            .then(response => {
+                console.log(response)
+                window.location.replace("/login");
+            })
+            .catch(error => {
+                showError("An error occurred while creating the user");
+            });
+    }
+
+    function showError(message) {
+        var errorDiv = document.getElementById("form-error");
+        errorDiv.textContent = message;
+        errorDiv.style.display = "block";
+    }
+
+    function clearError() {
+        var errorDiv = document.getElementById("form-error");
+        errorDiv.textContent = "";
+        errorDiv.style.display = "none";
+    }
+</script>
+</body>
+</html>

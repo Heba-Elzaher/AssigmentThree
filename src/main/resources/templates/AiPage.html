@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GreenRewards - AI</title>
+    <link rel="stylesheet" href="/css/AiPage.css">
+</head>
+<body>
+<header>
+    <div class="header-container">
+        <div class="logo">
+            <img src="/Images/image.png" alt="GreenRewards Logo">
+            <h1>GreenRewards</h1>
+        </div>
+        <nav class="navbar">
+            <ul class="nav-list">
+                <li class="nav-item"><a href="/dashboard" class="nav-link">Dashboard</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+<div class="container">
+    <h2>AI Analysis</h2>
+    <div class="history-content" id="history-content">
+        <!-- Cards will be generated here -->
+    </div>
+</div>
+<footer>
+    <div class="footer-container">
+        <p>&copy; 2024 GreenRewards. All rights reserved.</p>
+    </div>
+</footer>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        getTreeInfo();
+    });
+
+    async function getTreeInfo() {
+        try {
+            const response = await fetch("/allTrees", {
+                method: "GET"
+            });
+            if (!response.ok) {
+                throw new Error("Failed to fetch trees");
+            }
+            const data = await response.json();
+            displayTreeInfo(data);
+        } catch (error) {
+            alert("Failed to retrieve data. Please try again later. Error: " + error.message);
+        }
+    }
+
+    async function displayTreeInfo(trees) {
+        const historyContent = document.getElementById('history-content');
+        historyContent.innerHTML = ''; // Clear any existing content
+        const user_id = await getUser();
+        trees.forEach(tree => {
+            if (user_id === tree.user_id) {
+                const roundedLat = parseFloat(tree.location.split(',')[0]).toFixed(2);
+                const roundedLon = parseFloat(tree.location.split(',')[1]).toFixed(2);
+                const roundedLocation = `${roundedLat}, ${roundedLon}`;
+
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                <img src="data:image/jpeg;base64,${tree.photo}" alt="Tree" class="card-image">
+                <p><strong>Tree ID:</strong> ${tree.tree_id}</p>
+                <p><strong>Tree Location:</strong> ${roundedLocation}</p>
+                <p><strong>Reward:</strong> ${tree.points}</p>
+            `;
+                card.addEventListener('click', function() {
+                    analysis(tree.tree_id);
+                });
+                historyContent.appendChild(card);
+            }
+        });
+    }
+
+    function getCookie(name) {
+        var nameEQ = name + "=";
+        var ca = document.cookie.split(';');
+        for (var i = 0; i < ca.length; i++) {
+            var c = ca[i];
+            while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+            if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+        }
+        return null;
+    }
+
+    async function getUser() {
+        try {
+            const email = getCookie("email");
+            if (!email) {
+                throw new Error("Email cookie not found");
+            }
+
+            const response = await fetch(`/getUser/${encodeURIComponent(email)}`);
+            if (!response.ok) {
+                throw new Error("Failed to fetch user data");
+            }
+
+            const userData = await response.json();
+            return userData.user_id;
+        } catch (error) {
+            console.error("Error:", error);
+            return "error"; // Return an error message or handle it accordingly
+        }
+    }
+
+    function analysis(treeId) {
+        fetch("/analysis", {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: treeId
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Request failed");
+                }
+                return response.text();
+            })
+            .then(response => {
+                console.log(treeId)
+                window.location.replace(`/analysis?id=${encodeURIComponent(treeId)}`);
+            })
+            .catch(error => {
+                console.log(error)
+            });
+    }
+</script>
+</body>
+</html>

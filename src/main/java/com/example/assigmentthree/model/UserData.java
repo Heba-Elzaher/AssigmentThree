@@ -1,5 +1,6 @@
 package com.example.assigmentthree.model;
 
+import com.example.assigmentthree.spring_security.EncryptionDecryption;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -12,38 +13,45 @@ import java.util.List;
 @Table(name = "users")
 public class UserData {
 
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Convert(converter = EncryptionDecryption.class)
     private long user_id;
 
-
     @Column
+    @Convert(converter = EncryptionDecryption.class)
     private String first_name;
 
-
     @Column
+    @Convert(converter = EncryptionDecryption.class)
     private String last_name;
 
-
     @Column
+    @Convert(converter = EncryptionDecryption.class)
     private String email;
 
     @Column
+    @Convert(converter = EncryptionDecryption.class)
     private String password;
 
     @Column
+    @Convert(converter = EncryptionDecryption.class)
     private String date_of_birth;
- @Column
+
+    @Column
+    @Convert(converter = EncryptionDecryption.class)
     private String phone_number;
 
     @Column
+    @Convert(converter = EncryptionDecryption.class)
     private boolean isVerified;
 
     @Column
+    @Convert(converter = EncryptionDecryption.class)
     private String otp;
 
     @Column
+    @Convert(converter = EncryptionDecryption.class)
     private LocalDateTime otpTime;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)

@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GreenRewards Upload</title>
+    <link rel="stylesheet" href="/css/UploadPage.css">
+</head>
+<body>
+<header>
+    <div class="header-container">
+        <div class="logo">
+            <img src="/Images/image.png" alt="GreenRewards Logo">
+            <h1>GreenRewards</h1>
+        </div>
+        <nav class="navbar">
+            <ul class="nav-list">
+                <li class="nav-item"><a href="/dashboard" class="nav-link">Dashboard</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+<div class="container">
+    <h2>Upload a Picture</h2>
+    <div class="upload-content">
+        <div class="upload-box">
+            <input type="file" id="file-upload" class="file-input" hidden>
+            <label for="file-upload" class="upload-label">
+                <img src="/Images/image%20(9).png" alt="Upload Icon" class="upload-icon">
+            </label>
+            <div class="file-name" id="file-name"></div>
+        </div>
+        <div class="location-form">
+            <form id="location-date-form">
+                <div class="form-group">
+                    <label for="location">Current Location:</label>
+                    <input type="text" readonly id="location" name="location" required>
+                    <div class="error-message" id="location-error"></div>
+                </div>
+                <div class="form-group">
+                    <label for="date">Date:</label>
+                    <input type="date" id="date" name="date" required>
+                    <div class="error-message" id="date-error"></div>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn" id="uploadBtn">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="message" id="upload-message"></div>
+</div>
+<footer>
+    <div class="footer-container">
+        <p>&copy; 2024 GreenRewards. All rights reserved.</p>
+    </div>
+</footer>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const fileUpload = document.getElementById('file-upload');
+        const fileNameDisplay = document.getElementById('file-name');
+
+        fileUpload.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                fileNameDisplay.textContent = `Selected file: ${file.name}`;
+            } else {
+                fileNameDisplay.textContent = '';
+            }
+        });
+
+        const form = document.getElementById('location-date-form');
+        const locationInput = document.getElementById('location');
+        const dateInput = document.getElementById('date');
+        const errorMessages = {
+            location: document.getElementById('location-error'),
+            date: document.getElementById('date-error')
+        };
+
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+            uploadPhoto();
+        });
+
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function(position) {
+                const lat = position.coords.latitude;
+                const lon = position.coords.longitude;
+                locationInput.value = `${lat}, ${lon}`;
+            }, function(error) {
+                console.error("Error getting the location: ", error);
+                errorMessages.location.textContent = 'Unable to retrieve location.';
+            });
+        } else {
+            errorMessages.location.textContent = 'Geolocation is not supported by this browser.';
+        }
+    });
+
+    async function uploadPhoto() {
+        try {
+            var form = new FormData();
+            const fileUpload = document.getElementById('file-upload');
+            const file = fileUpload.files[0];
+            const location = document.getElementById('location').value;
+            const date = document.getElementById('date').value;
+
+            if (!file || !location || !date) {
+                throw new Error("All fields are required");
+            }
+
+            form.append("photo", file);
+            form.append("location", location);
+            form.append("date", date);
+
+            const user_id = await getUser();
+            form.append("user_id", user_id);
+
+            const uploadBtn = document.getElementById("uploadBtn");
+            uploadBtn.textContent = "Processing...";
+            uploadBtn.disabled = true;
+
+            const response = await fetch("/uploadTree", {
+                method: "POST",
+                body: form
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(errorText);
+            }
+
+            const data = await response.json();
+            showSuccess("Photo uploaded successfully");
+        } catch (error) {
+            console.error("Error:", error);
+            showError("Failed to upload photo. Please try again later. Error: " + error.message);
+        } finally {
+            const uploadBtn = document.getElementById("uploadBtn");
+            uploadBtn.textContent = "Submit";
+            uploadBtn.disabled = false;
+        }
+    }
+
+    function getCookie(name) {
+        const nameEQ = `${name}=`;
+        const ca = document.cookie.split(';');
+        for (let i = 0; i < ca.length; i++) {
+            let c = ca[i].trim();
+            if (c.indexOf(nameEQ) === 0) {
+                return c.substring(nameEQ.length);
+            }
+        }
+        return null;
+    }
+
+    async function getUser() {
+        try {
+            const email = getCookie("email");
+            if (!email) {
+                throw new Error("Email cookie not found");
+            }
+
+            const response = await fetch(`/getUser/${encodeURIComponent(email)}`);
+            if (!response.ok) {
+                throw new Error("Failed to fetch user data");
+            }
+
+            const userData = await response.json();
+            return userData.user_id;
+        } catch (error) {
+            console.error("Error:", error);
+            return "error";
+        }
+    }
+
+    function showSuccess(message) {
+        const messageDiv = document.getElementById("upload-message");
+        messageDiv.textContent = message;
+        messageDiv.style.color = "green";
+        messageDiv.style.display = "block";
+    }
+
+    function showError(message) {
+        const messageDiv = document.getElementById("upload-message");
+        messageDiv.textContent = message;
+        messageDiv.style.color = "red";
+        messageDiv.style.display = "block";
+    }
+
+</script>
+</body>
+</html>

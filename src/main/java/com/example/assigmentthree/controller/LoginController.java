@@ -1,6 +1,6 @@
 package com.example.assigmentthree.controller;
 
-import com.example.assigmentthree.model.AuthResponse;
+import com.example.assigmentthree.model.AuthenticationResponse;
 import com.example.assigmentthree.model.UserData;
 import com.example.assigmentthree.service.LoginService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,23 +19,28 @@ public class LoginController {
         this.loginService = loginService;
     }
 
-    @PostMapping(value = "/auth")
+    @PostMapping(value = "/authentication")
     public ResponseEntity<String> login(@RequestBody UserData userData) {
         return new ResponseEntity<String>(loginService.authentication(userData), HttpStatus.OK);
     }
 
-    @PostMapping(value = "/mfa")
+    @PostMapping(value = "/twoFA")
     public ResponseEntity<String> twoFactorAuth(@RequestBody UserData userData) {
         return new ResponseEntity<String>(loginService.generateTwoFactor(userData), HttpStatus.OK);
     }
 
-    @GetMapping(value = "/verify-account")
+    @GetMapping(value = "/accountVerification")
     public ResponseEntity<String> verify(@RequestParam String email, @RequestParam String otp) {
         return new ResponseEntity<>(loginService.verifyUser(email, otp), HttpStatus.OK);
     }
 
-    @GetMapping(value = "/verify")
-    public ResponseEntity<AuthResponse> verify(@RequestParam String email) {
-        return new ResponseEntity<AuthResponse>(loginService.isVerified(email), HttpStatus.OK);
+    @GetMapping(value = "/verifyUser")
+    public ResponseEntity<AuthenticationResponse> verifyUser(@RequestParam String email) {
+        return new ResponseEntity<AuthenticationResponse>(loginService.isVerified(email), HttpStatus.OK);
+    }
+
+    @PutMapping("/signOut")
+    public ResponseEntity<String> signOut(@RequestBody String email) {
+        return new ResponseEntity<>(loginService.signOut(email), HttpStatus.OK);
     }
 }

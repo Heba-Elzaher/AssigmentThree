@@ -28,8 +28,8 @@ public class SignUpController {
         return new ResponseEntity<UserData>(signUpService.addNewUser(userData), HttpStatus.CREATED);
     }
 
-    @GetMapping(value = "/getUser/{id}")
-    public ResponseEntity<UserData> getUser(@PathVariable("id") String email) {
+    @GetMapping(value = "/getUser/{email}")
+    public ResponseEntity<UserData> getUser(@PathVariable("email") String email) {
         return new ResponseEntity<UserData>(signUpService.getUserByEmail(email), HttpStatus.OK);
     }
 

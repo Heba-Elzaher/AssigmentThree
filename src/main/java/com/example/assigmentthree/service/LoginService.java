@@ -1,7 +1,7 @@
 package com.example.assigmentthree.service;
 
 import com.example.assigmentthree.model.UserData;
-import com.example.assigmentthree.model.AuthResponse;
+import com.example.assigmentthree.model.AuthenticationResponse;
 
 public interface LoginService {
     String authentication(UserData user);
@@ -10,5 +10,7 @@ public interface LoginService {
 
     String verifyUser(String email, String otp);
 
-    AuthResponse isVerified(String email);
+    AuthenticationResponse isVerified(String email);
+
+    String signOut(String email);
 }
