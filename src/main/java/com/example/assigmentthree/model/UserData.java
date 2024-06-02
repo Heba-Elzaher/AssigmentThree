@@ -40,10 +40,6 @@ public class UserData {
 
     @Column
     @Convert(converter = EncryptionDecryption.class)
-    private String phone_number;
-
-    @Column
-    @Convert(converter = EncryptionDecryption.class)
     private boolean isVerified;
 
     @Column

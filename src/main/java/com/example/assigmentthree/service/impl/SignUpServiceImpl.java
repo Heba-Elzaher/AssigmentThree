@@ -52,7 +52,6 @@ public class SignUpServiceImpl implements SignUpService {
         currentUser.setLast_name(user.getLast_name());
         currentUser.setEmail(user.getEmail());
         currentUser.setDate_of_birth(user.getDate_of_birth());
-        currentUser.setPhone_number(user.getPhone_number());
 
         userRepository.save(currentUser);
         return currentUser;
