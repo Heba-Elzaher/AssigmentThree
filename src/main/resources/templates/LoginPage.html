@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GreenRewards Sign In</title>
+    <link rel="stylesheet" href="/css/LoginPage.css">
+</head>
+<body>
+<header>
+    <div class="header-container">
+        <div class="logo">
+            <img src="/Images/image.png" alt="GreenRewards Logo">
+            <h1>GreenRewards</h1>
+        </div>
+        <nav class="navbar">
+            <ul class="nav-list">
+                <li class="nav-item"><a href="/" class="nav-link">Home</a></li>
+                <li class="nav-item"><a href="/signup" class="nav-link">Sign Up</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+<div class="container">
+    <h2>Hello, Please Sign In!</h2>
+    <div class="content">
+        <div class="form-container">
+            <form id="sign-in-form">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required>
+                    <div class="error-message" id="email-error"></div>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required>
+                    <div class="error-message" id="password-error"></div>
+                </div>
+                <div class="form-group">
+                    <button type="submit" id="loginButton" class="btn">Log In</button>
+                </div>
+                <div class="error-message" id="form-error"></div> <!-- Error message container -->
+            </form>
+        </div>
+        <div class="image-container">
+            <img src="/Images/image%20(8).png" alt="Login Illustration" class="large-image">
+        </div>
+    </div>
+</div>
+<footer>
+    <div class="footer-container">
+        <p>&copy; 2024 GreenRewards. All rights reserved.</p>
+    </div>
+</footer>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const form = document.getElementById('sign-in-form');
+        const email = document.getElementById('email');
+        const password = document.getElementById('password');
+        const errorMessages = {
+            email: document.getElementById('email-error'),
+            password: document.getElementById('password-error'),
+            form: document.getElementById('form-error') // Form error message container
+        };
+
+        form.addEventListener('submit', function (event) {
+            let isValid = true;
+
+            // Reset error messages
+            Object.values(errorMessages).forEach(errorDiv => {
+                errorDiv.textContent = '';
+            });
+
+            // Check if email is valid
+            if (!email.validity.valid) {
+                errorMessages.email.textContent = 'Please enter a valid email address.';
+                isValid = false;
+            }
+
+            // Check if password is provided
+            if (password.value.trim() === '') {
+                errorMessages.password.textContent = 'Password is required.';
+                isValid = false;
+            }
+
+            if (!isValid) {
+                event.preventDefault();
+            }
+        });
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+        var form = document.getElementById("sign-in-form");
+        var loginButton = document.getElementById("loginButton");
+
+        form.addEventListener("submit", function (event) {
+            event.preventDefault(); // Prevent the form from submitting the traditional way
+
+            var formData = {
+                email: form.email.value,
+                password: form.password.value
+            };
+
+            // Show loading state immediately after button click
+            loginButton.textContent = "Please Wait";
+            loginButton.disabled = true;
+
+            fetch("/authentication", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(formData)
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Login failed");
+                    }
+                    return response.text();
+                })
+                .then(response => handleTwoFactorAuth(response, formData.email))
+                .catch(error => {
+                    errorMessage("Invalid login credentials. Please try again.");
+                    console.error("Error:", error);
+                });
+        });
+
+        function handleTwoFactorAuth(response, email) {
+            if (response === "Authenticated") {
+
+                clearError();
+                fetch("/twoFA", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({email: email})
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Request failed');
+                        }
+                        loginButton.textContent = "Login";
+                        loginButton.disabled = false;
+                        // Redirect to /twoFactorAuth with the email as a query parameter
+                        window.location.replace(`/twoFactorAuthentication?email=${encodeURIComponent(email)}`);
+                    })
+                    .catch(error => {
+                        errorMessage("Invalid login credentials");
+                        console.error("Error:", error);
+                    });
+            } else {
+                errorMessage("Invalid login credentials");
+            }
+        }
+
+        function errorMessage(message) {
+            const formError = document.getElementById('form-error');
+            formError.textContent = message;
+            formError.style.display = 'block'; // Show error message
+        }
+
+        function clearError() {
+            const formError = document.getElementById('form-error');
+            formError.textContent = '';
+            formError.style.display = 'none'; // Hide error message
+        }
+    });
+
+</script>
+</body>
+</html>

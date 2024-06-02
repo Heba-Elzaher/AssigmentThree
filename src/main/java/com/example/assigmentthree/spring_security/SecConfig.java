@@ -40,7 +40,13 @@ public class SecConfig {
                 .sessionManagement(sessionManagement -> sessionManagement
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/addTree").authenticated()
+                        .requestMatchers( "/dashboard").authenticated()
+                        .requestMatchers( "/upload").authenticated()
+                        .requestMatchers( "/uploadTree").authenticated()
+                        .requestMatchers( "/allTrees").authenticated()
+                        .requestMatchers( "/history").authenticated()
+                        .requestMatchers( "/ai").authenticated()
+                        .requestMatchers( "/analysis").authenticated()
                         .requestMatchers( "/**").permitAll())
                 .httpBasic(withDefaults()); // checks if the user is authenticated
 

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GreenRewards - Analysis Result</title>
+    <link rel="stylesheet" href="/css/AnalysisResultPage.css">
+</head>
+<body>
+<header>
+    <div class="header-container">
+        <div class="logo">
+            <img src="/Images/image.png" alt="GreenRewards Logo">
+            <h1>GreenRewards</h1>
+        </div>
+        <nav class="navbar">
+            <ul class="nav-list">
+                <li class="nav-item"><a href="/dashboard" class="nav-link">Dashboard</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+<div class="container">
+    <h2>Analysis Result</h2>
+    <div class="result-content" id="result-content">
+        <!-- Analysis result will be displayed here -->
+    </div>
+</div>
+<footer>
+    <div class="footer-container">
+        <p>&copy; 2024 GreenRewards. All rights reserved.</p>
+    </div>
+</footer>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const urlParams = new URLSearchParams(window.location.search);
+        const treeId = urlParams.get('id');
+        if (treeId) {
+            displayAnalysisResult(treeId);
+        } else {
+            document.getElementById('result-content').innerHTML = '<p>No analysis result found. Tree ID is missing.</p>';
+        }
+    });
+
+    async function displayAnalysisResult(treeId) {
+        const resultContent = document.getElementById('result-content');
+
+        try {
+            const analysisResult = await getTreeInfo(treeId);
+            if (!analysisResult) {
+                resultContent.innerHTML = '<p>No analysis result found.</p>';
+                return;
+            }
+
+            const analysisHtml = `
+                <p><strong>Tree Species Identified:</strong> ${analysisResult.species}</p>
+                <p>${analysisResult.endangerment}</p>
+                <p>${analysisResult.tips}</p>
+                <p>${analysisResult.rarity}</p>
+            `;
+
+            resultContent.innerHTML = analysisHtml;
+        } catch (error) {
+            resultContent.innerHTML = `<p>Failed to retrieve analysis result. Error: ${error.message}</p>`;
+        }
+    }
+
+    async function getTreeInfo(treeId) {
+        try {
+            const response = await fetch("/getTree/" + treeId, {
+                method: "GET"
+            });
+            if (!response.ok) {
+                throw new Error("Failed to fetch tree information");
+            }
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            throw new Error("Failed to retrieve data. Please try again later. Error: " + error.message);
+        }
+    }
+</script>
+</body>
+</html>

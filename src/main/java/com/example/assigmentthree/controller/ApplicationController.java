@@ -13,49 +13,46 @@ public class ApplicationController {
         return "HomePage";
     }
 
-    @GetMapping(value = "/signUp")
-    public String signUp() {
-        return "signUp";
+    @GetMapping("/signup")
+    public String signup() {
+        return "SignUpPage";
     }
 
-    @GetMapping(value = "/login")
+    @GetMapping("/login")
     public String login() {
-        return "login";
+        return "LoginPage";
     }
 
-    @GetMapping(value = "/twoFactorAuth")
-    public String twoFactorAuth(@RequestParam(name = "email") String email, Model model) {
+    @GetMapping("/twoFactorAuthentication")
+    public String twoFactorAuthentication(@RequestParam(name = "email") String email, Model model) {
         model.addAttribute("email", email);
-        return "twoFactorAuth";
+        return "TwoFactorAuthPage";
     }
 
-    @GetMapping(value = "/dashboard")
+    @GetMapping("/dashboard")
     public String dashboard() {
-        return "dashboard";
+        return "DashboardPage";
     }
 
-    @GetMapping(value = "/uploadPage")
-    public String uploadPhoto() {
-        return "uploadPage";
+    @GetMapping("/upload")
+    public String upload() {
+        return "UploadPage";
     }
 
-    @GetMapping(value = "/history")
+    @GetMapping("/history")
     public String history() {
-        return "history";
+        return "HistoryPage";
     }
 
-    @GetMapping(value = "/points")
-    public String points() {
-        return "points";
+    @GetMapping("/ai")
+    public String ai() {
+        return "AiPage";
     }
 
-    @GetMapping(value = "/treeInfoPage")
-    public String treeInfo() {
-        return "treeInfo";
-    }
-
-    @GetMapping(value = "/updateUser")
-    public String updateUser() {
-        return "updateUser";
+    @GetMapping("/analysis")
+    public String analysis(@RequestParam(name = "id") String id_str, Model model) {
+        long id = Long.parseLong(id_str);
+        model.addAttribute("id", id);
+        return "AnalysisResultPage";
     }
 }
